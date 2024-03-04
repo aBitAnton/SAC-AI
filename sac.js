@@ -1,12 +1,21 @@
-var ajaxCall = (key, url, prompt) => {
+var ajaxCall = (key, url, messages) => {
   return new Promise((resolve, reject) => {
     $.ajax({
       url: url,
       type: "POST",
       dataType: "json",
       data: JSON.stringify({
-        model: "text-davinci-002",
-        prompt: prompt,
+        model: "gpt-4-1106-preview",
+        messages: [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": messages
+      }
+    ],
         max_tokens: 1024,
         n: 1,
         temperature: 0.5,
@@ -39,14 +48,14 @@ const url = "https://api.openai.com/v1";
       </div>
     `;
   class MainWebComponent extends HTMLElement {
-    async post(apiKey, endpoint, prompt) {
+    async post(apiKey, endpoint, messages) {
       const { response } = await ajaxCall(
         apiKey,
         `${url}/${endpoint}`,
-        prompt
+        messages
       );
-      //console.log(response.choices[0].text);
-      return response.choices[0].text;
+      console.log(response.choices[0].message.content);
+      return response.choices[0].message.content;
     }
   }
   customElements.define("custom-widget", MainWebComponent);
